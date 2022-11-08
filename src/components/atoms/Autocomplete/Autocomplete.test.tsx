@@ -166,6 +166,19 @@ describe('Autocomplete', () => {
          expect(onObjectSelected).toBeCalledWith("Ciao come stai?")
       });
 
+      it("passes correct object on item selection with enter", () => {
+         const onObjectSelected = jest.fn();
+         const { input } = setup({ onObjectSelected })
+   
+         userEvent.type(input, 'Ciao')
+         userEvent.type(input, `{arrowdown}`)
+         userEvent.type(input, `{arrowdown}`)
+         userEvent.type(input, `{enter}`)
+   
+         expect(onObjectSelected).toBeCalledTimes(1)
+         expect(onObjectSelected).toBeCalledWith("Ciao come stai?")
+      });
+
       it("highlights suggestions correctly when pressing up and down arrow keys", () => {
          const onSuggestionArrowDown = jest.fn();
          const onSuggestionArrowUp = jest.fn();
