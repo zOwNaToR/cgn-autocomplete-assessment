@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const cachedQueries: Record<string, any> = {};
+export let cachedQueries: Record<string, any> = {};
 
 type useQueryParams<T> = {
 	key: string;
@@ -40,7 +40,7 @@ const useQuery = <T>({ key, queryFn, enabled = true }: useQueryParams<T>) => {
 
 		queryFn(signal)
 			.then((json) => handleSetData(json, true))
-			.catch((err: Error) => handleSetError(err.message));
+			.catch((err: Error) => handleSetError(err.message || err.toString()));
 	};
 
 	const refetch = () => setForceRefetchCounter((prev) => prev + 1);
