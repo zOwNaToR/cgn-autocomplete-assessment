@@ -21,14 +21,14 @@ const PublicapisAutocomplete = (props: PublicapisAutocompleteProps) => {
    })
 
    const suggestions = (isLoading || !data || !data.entries) ? [] : data.entries
-   const error = !isLoading && inputValue.length >= minInputLength && !suggestions.length ? "Incorrect entry." : ""
+   const error = props.error || (!isLoading && inputValue.length >= minInputLength && !suggestions.length ? "Incorrect entry." : "")
 
    return (
       <Autocomplete<PublicApisItem>
+         error={error}
          {...props}
          suggestions={suggestions}
          minLength={minInputLength}
-         error={error}
          filterSuggestions={() => true}
          getSuggestionLabel={item => item.Description}
          onInputChange={(value, changeType) => {
