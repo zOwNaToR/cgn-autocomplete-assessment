@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Key } from 'ts-key-enum'
 import useForceRender from '../../../hooks/useForceRender'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
+import useVerticalKeyboardNavigation from '../../../hooks/useVerticalKeyboardNavigation/useVerticalKeyboardNavigation'
 import { cx } from '../../../utils/stringUtils'
 import TextField from '../TextField/TextField'
 import './styles.css'
@@ -36,7 +37,6 @@ const AutocompleteInner = <T extends SuggestionType>({
    ...textFieldProps
 }: AutocompleteProps<T>, ref: React.ForwardedRef<HTMLInputElement>) => {
    const [filteredSuggestions, setFilteredSuggestions] = useState<T[]>([])
-   const [highlightedSuggestionIndex, setHighlightedSuggestionIndex] = useState(-1)
    const [selectedSuggestion, setSelectedSuggestion] = useState<T | null>(null)
    const [isSuggestionMenuOpen, setIsSuggestionMenuOpen] = useState(false)
    const [, forceRerender] = useForceRender()
@@ -44,6 +44,11 @@ const AutocompleteInner = <T extends SuggestionType>({
    const rootRef = useRef<HTMLDivElement | null>(null)
    const inputRef = useRef<HTMLInputElement | null>(null)
    const dropdownRef = useRef<HTMLUListElement>(null)
+
+   const keyboardVerticalNavigation = useVerticalKeyboardNavigation({
+      topLimit: 0,
+      bottomLimit: filteredSuggestions?.length - 1 ?? 0,
+   })
 
    useOnClickOutside(dropdownRef, () => {
       setIsSuggestionMenuOpen(false)
@@ -64,40 +69,26 @@ const AutocompleteInner = <T extends SuggestionType>({
    };
 
    const handleInputKeyDown = (e: React.KeyboardEvent) => {
-      if (e.code === Key.Enter) {
-         selectItem(filteredSuggestions[highlightedSuggestionIndex])
+      const code = e.code
+
+
+      if (code === Key.Enter) {
+         selectSuggestion(filteredSuggestions[keyboardVerticalNavigation.index])
          return
       }
 
-      const upperLimitReached = highlightedSuggestionIndex <= 0
-      const lowerLimitReached = highlightedSuggestionIndex + 1 === filteredSuggestions.length
-
-      if (e.code === Key.ArrowUp) {
+      const nextIndex = keyboardVerticalNavigation.handleKeyDown(code)
+      if (nextIndex > -1) {
          e.preventDefault()
-         if (upperLimitReached) return
 
-         const nextIndex = highlightedSuggestionIndex - 1
-
-         setHighlightedSuggestionIndex(nextIndex)
-         onSuggestionArrowUp?.(filteredSuggestions[nextIndex])
-         return
-      }
-
-      if (e.code === Key.ArrowDown) {
-         e.preventDefault()
-         if (lowerLimitReached) return
-
-         const nextIndex = highlightedSuggestionIndex + 1
-
-         setHighlightedSuggestionIndex(nextIndex)
-         onSuggestionArrowDown?.(filteredSuggestions[nextIndex])
-         return
+         code === Key.ArrowUp && onSuggestionArrowUp?.(filteredSuggestions[nextIndex])
+         code === Key.ArrowDown && onSuggestionArrowDown?.(filteredSuggestions[nextIndex])
       }
    }
 
    const handleInputFocus = () => suggestionsMenuHandle()
 
-   const handleSuggestionItemClick = (clickedSuggestion: T) => selectItem(clickedSuggestion)
+   const handleSuggestionItemClick = (clickedSuggestion: T) => selectSuggestion(clickedSuggestion)
 
    const suggestionsMenuHandle = useCallback(() => {
       const inputValue = inputRef.current?.value ?? ''
@@ -107,9 +98,9 @@ const AutocompleteInner = <T extends SuggestionType>({
          ? suggestions.filter(suggestion => filterSuggestions!(inputValue, suggestion))
          : []
 
-      setHighlightedSuggestionIndex(-1)
       setFilteredSuggestions(filteredSuggestions)
       setIsSuggestionMenuOpen(minLengthSatisfied)
+      keyboardVerticalNavigation.resetIndex()
    }, [minLength, suggestions])
 
    const setInputRefValue = (value: string, changeType: ChangeType) => {
@@ -117,11 +108,11 @@ const AutocompleteInner = <T extends SuggestionType>({
       onInputChange?.(value, changeType)
    }
 
-   const selectItem = (item: T) => {
+   const selectSuggestion = (item: T) => {
       setSelectedSuggestion(item)
       setIsSuggestionMenuOpen(false)
-      setHighlightedSuggestionIndex(-1)
       setInputRefValue(getSuggestionLabel!(item), "selected")
+      keyboardVerticalNavigation.resetIndex()
 
       onObjectSelected?.(item)
    }
@@ -130,9 +121,7 @@ const AutocompleteInner = <T extends SuggestionType>({
 
    filterSuggestions ??= (inputValue: string, suggestion: T) => getSuggestionLabel!(suggestion).toLowerCase().includes(inputValue.toLowerCase())
 
-   useEffect(() => {
-      suggestionsMenuHandle()
-   }, [suggestions, suggestionsMenuHandle])
+   useEffect(() => suggestionsMenuHandle(), [suggestions, suggestionsMenuHandle])
 
    const shouldSeeSuggestions = !isLoading && isSuggestionMenuOpen && !!filteredSuggestions.length
 
@@ -160,7 +149,7 @@ const AutocompleteInner = <T extends SuggestionType>({
                {filteredSuggestions.map((suggestion, i) => {
                   const label = getSuggestionLabel!(suggestion)
                   const isSelected = suggestion === selectedSuggestion
-                  const isActive = highlightedSuggestionIndex === i
+                  const isActive = keyboardVerticalNavigation.index === i
 
                   return (
                      <li
