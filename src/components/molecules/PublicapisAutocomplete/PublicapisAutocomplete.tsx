@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import useQuery from '../../../hooks/useQuery'
+import useQuery from '../../../hooks/useQuery/useQuery'
 import { PublicApisItem, PublicApisResponse } from '../../../models/PublicApisResponse'
 import { fetchApis } from '../../../services/publicApisService'
 import Autocomplete from '../../atoms/Autocomplete/Autocomplete'
