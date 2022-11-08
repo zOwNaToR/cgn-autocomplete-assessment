@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Key } from 'ts-key-enum'
+import useForceRender from '../../../hooks/useForceRender'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import { cx } from '../../../utils/stringUtils'
 import TextField from '../TextField/TextField'
@@ -38,6 +39,7 @@ const AutocompleteInner = <T extends SuggestionType>({
    const [highlightedSuggestionIndex, setHighlightedSuggestionIndex] = useState(-1)
    const [selectedSuggestion, setSelectedSuggestion] = useState<T | null>(null)
    const [isSuggestionMenuOpen, setIsSuggestionMenuOpen] = useState(false)
+   const [, forceRerender] = useForceRender()
 
    const rootRef = useRef<HTMLDivElement | null>(null)
    const inputRef = useRef<HTMLInputElement | null>(null)
@@ -46,9 +48,12 @@ const AutocompleteInner = <T extends SuggestionType>({
    useOnClickOutside(dropdownRef, () => {
       setIsSuggestionMenuOpen(false)
    })
-   
+
    useOnClickOutside(rootRef, () => {
-      if (!!selectedSuggestion) setInputRefValue(getSuggestionLabel!(selectedSuggestion), "restore")
+      if (!!selectedSuggestion) {
+         setInputRefValue(getSuggestionLabel!(selectedSuggestion), "restore")
+         forceRerender()
+      }
    })
 
    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

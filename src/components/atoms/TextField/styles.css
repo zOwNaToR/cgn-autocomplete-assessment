@@ -2,12 +2,30 @@
 .text-field-root {
 	width: -webkit-fill-available;
 	display: inline-flex;
-	flex-direction: column;
 	position: relative;
 	vertical-align: top;
 	margin: 8px 0;
-}
 
+	font-weight: 400;
+	font-size: 1rem;
+	line-height: 1.4375em;
+	letter-spacing: 0.01em;
+	box-sizing: border-box;
+
+	cursor: text;
+	-webkit-box-align: center;
+	align-items: center;
+
+	border: 2px solid;
+	border-color: #6f7e8c;
+	border-radius: 4px;
+}
+.text-field-root:focus-within {
+	border-color: #0068d6;
+}
+.text-field-root.has-error {
+	border-color: red;
+}
 /* Container */
 .text-field-container {
 	font-weight: 400;
@@ -63,9 +81,8 @@
 
 /* Label */
 .text-field-label {
-	background-color: white;
-	font-weight: 400;
-	font-size: 1rem;
+	font-weight: 500;
+	font-size: 0.9rem;
 	line-height: 1.4375em;
 	letter-spacing: 0.00938em;
 	text-transform: capitalize;
@@ -76,24 +93,29 @@
 	text-overflow: ellipsis;
 	max-width: calc(133% - 24px);
 
-	z-index: 1;
-	position: absolute;
-	left: 0px;
-	top: 0px;
-
 	padding: 0 5px;
 
-	transform-origin: left top;
-	transform: translate(14px, -9px) scale(0.75);
-	transition: color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms,
-		transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms, max-width 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+	z-index: 1;
+	position: absolute;
+	top: 50%;
 
-	pointer-events: auto;
+	transform-origin: left top;
+	transform: translate(14px, -9px);
+	transition: 0.2s ease;
+
+	pointer-events: none;
 	user-select: none;
 }
 
-.text-field-root:focus-within .text-field-label {
+.text-field:focus + .text-field-label,
+.text-field.has-value + .text-field-label {
+	background-color: white;
 	color: #0068d6;
+
+	font-size: 0.75rem;
+
+	top: 0px;
+	left: 0px;
 }
 
 .text-field-root.disabled .text-field-label {

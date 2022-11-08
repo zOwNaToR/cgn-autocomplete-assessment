@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import useForceRender from '../useForceRender';
 
 export let cachedQueries: Record<string, any> = {};
 
@@ -9,10 +10,10 @@ type useQueryParams<T> = {
 };
 
 const useQuery = <T>({ key, queryFn, enabled = true }: useQueryParams<T>) => {
-	const [forceRefetchCounter, setForceRefetchCounter] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [data, setData] = useState<T | undefined>(undefined);
+	const [forceFetchCount, forceRerender] = useForceRender()
 
 	useEffect(() => {
 		if (!enabled) {
@@ -27,7 +28,7 @@ const useQuery = <T>({ key, queryFn, enabled = true }: useQueryParams<T>) => {
 		return () => {
 			abortController.abort();
 		};
-	}, [key, enabled, forceRefetchCounter]);
+	}, [key, enabled, forceFetchCount]);
 
 	const fetchData = (forceRefetch: boolean, signal: AbortSignal) => {
 		setIsLoading(true);
@@ -42,8 +43,6 @@ const useQuery = <T>({ key, queryFn, enabled = true }: useQueryParams<T>) => {
 			.then((json) => handleSetData(json, true))
 			.catch((err: Error) => handleSetError(err.message || err.toString()));
 	};
-
-	const refetch = () => setForceRefetchCounter((prev) => prev + 1);
 
 	const remove = () => {
 		if (key in cachedQueries){
@@ -73,7 +72,7 @@ const useQuery = <T>({ key, queryFn, enabled = true }: useQueryParams<T>) => {
 		error,
 		isError: !!error,
 		data,
-		refetch,
+		refetch: forceRerender,
 		remove,
 	};
 };
