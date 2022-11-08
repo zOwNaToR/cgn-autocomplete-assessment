@@ -70,8 +70,6 @@ const AutocompleteInner = <T extends SuggestionType>({
 
    const handleInputKeyDown = (e: React.KeyboardEvent) => {
       const code = e.code
-
-
       if (code === Key.Enter) {
          selectSuggestion(filteredSuggestions[keyboardVerticalNavigation.index])
          return
