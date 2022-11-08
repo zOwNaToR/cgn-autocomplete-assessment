@@ -46,7 +46,7 @@ describe('Autocomplete', () => {
 
    it("calls onInputChange when input value is changed", () => {
       const onInputChange = jest.fn();
-      const { input, getSuggestionsItems } = setup({ onInputChange })
+      const { input } = setup({ onInputChange })
 
       userEvent.type(input, 'Ciao')
 
@@ -56,7 +56,7 @@ describe('Autocomplete', () => {
 
    it("does not filter suggestions when user types inside input if custom filterSuggestions function is passed", () => {
       const filterSuggestions = () => true
-      const { input, getSuggestionsItems, getSuggestionsMenu } = setup({ filterSuggestions })
+      const { input, getSuggestionsItems } = setup({ filterSuggestions })
 
       userEvent.type(input, 'Ciao')
 
