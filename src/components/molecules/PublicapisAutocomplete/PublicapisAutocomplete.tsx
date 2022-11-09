@@ -32,7 +32,7 @@ const PublicapisAutocomplete = (props: PublicapisAutocompleteProps) => {
          filterSuggestions={() => true}
          getSuggestionLabel={item => item.Description}
          onInputChange={(value, changeType) => {
-            if (changeType === "change") setInputValue(value)
+            if (changeType === "change" || changeType === "clear") setInputValue(value)
 
             props.onInputChange?.(value, changeType)
          }}
