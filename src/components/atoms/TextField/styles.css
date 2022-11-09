@@ -88,8 +88,8 @@
 	user-select: none;
 }
 
-.text-field:focus + .text-field-label,
-.text-field.has-value + .text-field-label {
+.text-field:focus ~ .text-field-label,
+.text-field.has-value ~ .text-field-label {
 	background-color: white;
 	color: #0068d6;
 
@@ -104,6 +104,13 @@
 }
 .text-field-root.has-error .text-field-label {
 	color: red;
+}
+
+/* End Adornment */
+.text-field-end-icon {
+	display: flex;
+	align-items: center;
+	margin-right: 0.8rem;
 }
 
 /* Error */

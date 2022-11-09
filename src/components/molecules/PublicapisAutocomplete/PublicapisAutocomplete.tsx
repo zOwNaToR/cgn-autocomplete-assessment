@@ -33,6 +33,8 @@ const PublicapisAutocomplete = (props: PublicapisAutocompleteProps) => {
          getSuggestionLabel={item => item.Description}
          onInputChange={(value, changeType) => {
             if (changeType === "change") setInputValue(value)
+
+            props.onInputChange?.(value, changeType)
          }}
       />
    )

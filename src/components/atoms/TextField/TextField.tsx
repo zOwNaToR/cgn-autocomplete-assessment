@@ -6,11 +6,13 @@ import './styles.css'
 type TextFieldProps = React.ComponentProps<'input'> & {
    label: string
    error?: string
+   endAdornment?: React.ReactNode
 }
 
 const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(({
    label,
    error,
+   endAdornment,
    ...props
 }, ref) => {
    const inputRef = useInputRef({ forwardRef: ref })
@@ -32,6 +34,11 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(({
                aria-label={label}
                {...props}
             />
+            {endAdornment && (
+               <div className='text-field-end-icon'>
+                  {endAdornment}
+               </div>
+            )}
             <label className="text-field-label">{label}</label>
          </div>
          {error && <p className="text-field-error">{error}</p>}

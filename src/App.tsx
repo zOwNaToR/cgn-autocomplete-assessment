@@ -7,7 +7,7 @@ import { PublicApisItem } from './models/PublicApisResponse';
 const mockSuggestionsString = ["Ciao", "Hey come stai?", "Ciao come stai?", "Omar", "Paolo"]
 
 const App = () => {
-  const [selectedItem, setSelectedItem] = useState<PublicApisItem>()
+  const [selectedItem, setSelectedItem] = useState<PublicApisItem | null>(null)
 
   return (
     <div className="App">
@@ -24,7 +24,11 @@ const App = () => {
         </div>
 
         <h1>Full functionality example:</h1>
-        <PublicapisAutocomplete label="Search input" onObjectSelected={setSelectedItem} />
+        <PublicapisAutocomplete
+          label="Search input"
+          onObjectSelected={setSelectedItem}
+          onClearSelection={() => setSelectedItem(null)}
+        />
         {!!selectedItem ? (
           <>
             <p>Last selected item:</p>

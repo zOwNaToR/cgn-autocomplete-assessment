@@ -2,12 +2,14 @@ export type SuggestionType = string | Record<string, any>;
 
 export enum SuggestionActionKind {
 	SELECT_SUGGESTION = 'SELECT_SUGGESTION',
+   CLEAR_SELECTION = 'CLEAR_SELECTION',
 	SET_FILTERED_SUGGESTIONS = 'SET_FILTERED_SUGGESTIONS',
 	CLOSE_MENU = 'CLOSE_MENU',
 }
 
 type SuggestionAction<T extends SuggestionType> =
 	| { type: SuggestionActionKind.SELECT_SUGGESTION; payload: T }
+	| { type: SuggestionActionKind.CLEAR_SELECTION }
 	| { type: SuggestionActionKind.CLOSE_MENU }
 	| {
 			type: SuggestionActionKind.SET_FILTERED_SUGGESTIONS;
@@ -35,6 +37,12 @@ export const createSuggestionsReducer =
 					isMenuOpen: false,
 					selectedSuggestion: action.payload,
 				};
+         case SuggestionActionKind.CLEAR_SELECTION:
+            return {
+               ...state,
+               isMenuOpen: false,
+               selectedSuggestion: null,
+            }
 			case SuggestionActionKind.CLOSE_MENU:
 				return {
 					...state,

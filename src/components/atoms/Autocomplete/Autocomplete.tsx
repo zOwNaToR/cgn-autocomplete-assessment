@@ -4,11 +4,12 @@ import useInputRef from '../../../hooks/useInputRef/useInputRef'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import useVerticalKeyboardNavigation from '../../../hooks/useVerticalKeyboardNavigation/useVerticalKeyboardNavigation'
 import { cx } from '../../../utils/stringUtils'
+import DeleteIcon from '../DeleteIcon'
 import TextField from '../TextField/TextField'
 import { createSuggestionsReducer, SuggestionActionKind, SuggestionType } from './reducers'
 import './styles.css'
 
-type ChangeType = "restore" | "change" | "selected"
+type ChangeType = "restore" | "change" | "selected" | "clear"
 
 type AutocompleteProps<T extends SuggestionType> = React.ComponentProps<typeof TextField> & {
    suggestions: T[]
@@ -18,6 +19,7 @@ type AutocompleteProps<T extends SuggestionType> = React.ComponentProps<typeof T
    getSuggestionLabel?: (suggestion: T) => string
    filterSuggestions?: (inputValue: string, suggestion: T) => boolean
    onObjectSelected?: (suggestion: T) => void
+   onClearSelection?: () => void
    onSuggestionArrowDown?: (suggestion: T) => void
    onSuggestionArrowUp?: (suggestion: T) => void
    onInputChange?: (value: string, changeType: ChangeType) => void
@@ -31,6 +33,7 @@ const AutocompleteInner = <T extends SuggestionType>({
    getSuggestionLabel,
    filterSuggestions,
    onObjectSelected,
+   onClearSelection,
    onSuggestionArrowDown,
    onSuggestionArrowUp,
    onInputChange,
@@ -82,6 +85,13 @@ const AutocompleteInner = <T extends SuggestionType>({
       }
    }
 
+   const handleClickClearBtn = () => {
+      dispatch({ type: SuggestionActionKind.CLEAR_SELECTION })
+      setInputRefValue("", "clear")
+
+      onClearSelection?.()
+   }
+
    const handleInputFocus = () => doFilterSuggestions()
 
    const handleSuggestionItemClick = (clickedSuggestion: T) => selectSuggestion(clickedSuggestion)
@@ -131,8 +141,9 @@ const AutocompleteInner = <T extends SuggestionType>({
             onChange={handleInputChange}
             onKeyDown={handleInputKeyDown}
             onFocus={handleInputFocus}
+            endAdornment={!!selectedSuggestion && <DeleteIcon onClick={handleClickClearBtn} />}
          />
-
+         
          {shouldSeeSuggestions && (
             <ul ref={dropdownRef} className="suggestions-menu" data-testid="suggestions-menu">
                {filteredSuggestions.map((suggestion, i) => {
