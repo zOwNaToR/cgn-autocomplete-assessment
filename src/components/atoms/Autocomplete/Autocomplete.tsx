@@ -92,11 +92,11 @@ const AutocompleteInner = <T extends SuggestionType>({
       const inputValue = inputRef.current?.value ?? ''
       const minLengthSatisfied = inputValue.length >= minLength
 
-      const filteredSuggestions = minLengthSatisfied
+      const nextFilteredSuggestions = minLengthSatisfied
          ? suggestions.filter(suggestion => filterSuggestions!(inputValue, suggestion))
          : []
 
-      setFilteredSuggestions(filteredSuggestions)
+      setFilteredSuggestions(nextFilteredSuggestions)
       setIsSuggestionMenuOpen(minLengthSatisfied)
       keyboardVerticalNavigation.resetIndex()
    }, [minLength, suggestions])
