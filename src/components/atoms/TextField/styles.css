@@ -2,32 +2,14 @@
 .text-field-root {
 	width: -webkit-fill-available;
 	display: inline-flex;
+	flex-direction: column;
 	position: relative;
 	vertical-align: top;
 	margin: 8px 0;
-
-	font-weight: 400;
-	font-size: 1rem;
-	line-height: 1.4375em;
-	letter-spacing: 0.01em;
-	box-sizing: border-box;
-
-	cursor: text;
-	-webkit-box-align: center;
-	align-items: center;
-
-	border: 2px solid;
-	border-color: #6f7e8c;
-	border-radius: 4px;
 }
-.text-field-root:focus-within {
-	border-color: #0068d6;
-}
-.text-field-root.has-error {
-	border-color: red;
-}
-/* Container */
-.text-field-container {
+
+/* Wrapper */
+.text-field-wrapper {
 	font-weight: 400;
 	font-size: 1rem;
 	line-height: 1.4375em;
@@ -45,11 +27,10 @@
 	border-radius: 4px;
 }
 
-.text-field-container:focus-within {
+.text-field-wrapper:focus-within {
 	border-color: #0068d6;
 }
-
-.text-field-root.has-error .text-field-container {
+.text-field-root.has-error .text-field-wrapper {
 	border-color: red;
 }
 
@@ -121,7 +102,6 @@
 .text-field-root.disabled .text-field-label {
 	color: #6f7e8c;
 }
-
 .text-field-root.has-error .text-field-label {
 	color: red;
 }

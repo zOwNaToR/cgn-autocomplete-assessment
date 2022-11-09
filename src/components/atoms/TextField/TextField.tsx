@@ -23,22 +23,24 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(({
          "disabled": props.disabled,
       })}
       >
-         <input
-            ref={(node) => {
-               inputRef.current = node;
+         <div className="text-field-wrapper">
+            <input
+               ref={(node) => {
+                  inputRef.current = node;
 
-               if (typeof ref === 'function') {
-                  ref(node);
-               } else if (ref) {
-                  ref.current = node;
-               }
-            }}
-            type="text"
-            className={cx("text-field", { "has-value": hasValue })}
-            aria-label={label}
-            {...props}
-         />
-         <label className="text-field-label">{label}</label>
+                  if (typeof ref === 'function') {
+                     ref(node);
+                  } else if (ref) {
+                     ref.current = node;
+                  }
+               }}
+               type="text"
+               className={cx("text-field", { "has-value": hasValue })}
+               aria-label={label}
+               {...props}
+            />
+            <label className="text-field-label">{label}</label>
+         </div>
          {error && <p className="text-field-error">{error}</p>}
       </div>
    )
