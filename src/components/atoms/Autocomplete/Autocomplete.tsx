@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useRef } from 'react'
-import { Key } from 'ts-key-enum'
+import { Key } from '../../../utils/constants'
 import useInputRef from '../../../hooks/useInputRef/useInputRef'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import useVerticalKeyboardNavigation from '../../../hooks/useVerticalKeyboardNavigation/useVerticalKeyboardNavigation'
@@ -143,7 +143,7 @@ const AutocompleteInner = <T extends SuggestionType>({
             onFocus={handleInputFocus}
             endAdornment={!!selectedSuggestion && <DeleteIcon onClick={handleClickClearBtn} />}
          />
-         
+
          {shouldSeeSuggestions && (
             <ul ref={dropdownRef} className="suggestions-menu" data-testid="suggestions-menu">
                {filteredSuggestions.map((suggestion, i) => {

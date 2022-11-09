@@ -1,7 +1,6 @@
 import { renderHook, RenderHookResult } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import { Key } from 'ts-key-enum';
-import { removeObjectKeys } from '../../utils/objectUtils';
+import { Key } from '../../utils/constants'
 import useVerticalKeyboardNavigation from './useVerticalKeyboardNavigation';
 
 type useVerticalKeyboardNavigationReturnType =

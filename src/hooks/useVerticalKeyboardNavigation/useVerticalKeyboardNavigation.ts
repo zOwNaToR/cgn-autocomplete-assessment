@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Key } from 'ts-key-enum';
+import { Key } from '../../utils/constants'
 
 type useVerticalKeyboardNavigationParams = {
 	topLimit: number;
