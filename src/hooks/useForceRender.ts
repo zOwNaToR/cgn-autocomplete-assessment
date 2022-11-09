@@ -1,9 +1,9 @@
-import { useState } from "react"
+import { useCallback, useState } from "react"
 
 const useForceRender = () => {
    const [forceRenderCount, setForceRenderCount] = useState(0)
 
-   const forceRerender = () => setForceRenderCount(prev => prev + 1)
+   const forceRerender = useCallback(() => setForceRenderCount(prev => prev + 1), [])
 
    return [
       forceRenderCount,

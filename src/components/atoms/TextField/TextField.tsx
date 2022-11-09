@@ -1,4 +1,5 @@
-import React, { useRef } from 'react'
+import React from 'react'
+import useInputRef from '../../../hooks/useInputRef/useInputRef'
 import { cx } from '../../../utils/stringUtils'
 import './styles.css'
 
@@ -12,10 +13,10 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(({
    error,
    ...props
 }, ref) => {
-   const inputRef = useRef<HTMLInputElement | null>(null)
+   const inputRef = useInputRef({ forwardRef: ref })
 
    const hasError = !!error
-   const hasValue = !!inputRef.current?.value
+   const hasValue = !!inputRef.getValue()
 
    return (
       <div className={cx("text-field-root", {
@@ -25,15 +26,7 @@ const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(({
       >
          <div className="text-field-wrapper">
             <input
-               ref={(node) => {
-                  inputRef.current = node;
-
-                  if (typeof ref === 'function') {
-                     ref(node);
-                  } else if (ref) {
-                     ref.current = node;
-                  }
-               }}
+               ref={inputRef.register}
                type="text"
                className={cx("text-field", { "has-value": hasValue })}
                aria-label={label}
