@@ -2,7 +2,13 @@
 
 ## Project Info
 
-The project has only 1 external dependency (ts-key-enum) that exposes an enum of all keys on keydown event.  
+This project has the goal to create an Autocomplete component in React.
+
+If you start the project with `npm start` you will able to view:
+* Simple examples (only ui feature, like disabled or with an error)
+* Full working example of the Autocomplete populated with data from an open api on user typing.
+
+The project has 0 external dependency.
 
 ## Available Scripts
 
