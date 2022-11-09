@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useReducer, useRef } from 'react'
 import { Key } from 'ts-key-enum'
 import useInputRef from '../../../hooks/useInputRef/useInputRef'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import useVerticalKeyboardNavigation from '../../../hooks/useVerticalKeyboardNavigation/useVerticalKeyboardNavigation'
 import { cx } from '../../../utils/stringUtils'
 import TextField from '../TextField/TextField'
+import { createSuggestionsReducer, SuggestionActionKind, SuggestionType } from './reducers'
 import './styles.css'
 
-export type SuggestionType = string | Record<string, any>
 type ChangeType = "restore" | "change" | "selected"
 
 type AutocompleteProps<T extends SuggestionType> = React.ComponentProps<typeof TextField> & {
@@ -36,9 +36,11 @@ const AutocompleteInner = <T extends SuggestionType>({
    onInputChange,
    ...textFieldProps
 }: AutocompleteProps<T>, ref: React.ForwardedRef<HTMLInputElement>) => {
-   const [filteredSuggestions, setFilteredSuggestions] = useState<T[]>([])
-   const [selectedSuggestion, setSelectedSuggestion] = useState<T | null>(null)
-   const [isSuggestionMenuOpen, setIsSuggestionMenuOpen] = useState(false)
+   const [{ filteredSuggestions, selectedSuggestion, isMenuOpen }, dispatch] = useReducer(createSuggestionsReducer<T>(), {
+      filteredSuggestions: [],
+      selectedSuggestion: null,
+      isMenuOpen: false,
+   })
 
    const rootRef = useRef<HTMLDivElement | null>(null)
    const inputRef = useInputRef({ forwardRef: ref })
@@ -50,7 +52,7 @@ const AutocompleteInner = <T extends SuggestionType>({
    })
 
    useOnClickOutside(dropdownRef, () => {
-      setIsSuggestionMenuOpen(false)
+      dispatch({ type: SuggestionActionKind.CLOSE_MENU })
    })
 
    useOnClickOutside(rootRef, () => {
@@ -61,7 +63,7 @@ const AutocompleteInner = <T extends SuggestionType>({
       const inputValue = e.currentTarget.value
       setInputRefValue(inputValue, "change")
 
-      suggestionsMenuHandle()
+      doFilterSuggestions()
    };
 
    const handleInputKeyDown = (e: React.KeyboardEvent) => {
@@ -71,31 +73,40 @@ const AutocompleteInner = <T extends SuggestionType>({
          return
       }
 
+      if (code === Key.ArrowUp || code === Key.ArrowDown) e.preventDefault()
+
       const nextIndex = keyboardVerticalNavigation.handleKeyDown(code)
       if (nextIndex > -1) {
-         e.preventDefault()
-
          code === Key.ArrowUp && onSuggestionArrowUp?.(filteredSuggestions[nextIndex])
          code === Key.ArrowDown && onSuggestionArrowDown?.(filteredSuggestions[nextIndex])
       }
    }
 
-   const handleInputFocus = () => suggestionsMenuHandle()
+   const handleInputFocus = () => doFilterSuggestions()
 
    const handleSuggestionItemClick = (clickedSuggestion: T) => selectSuggestion(clickedSuggestion)
 
-   const suggestionsMenuHandle = useCallback(() => {
-      const inputValue = inputRef.getValue()
-      const minLengthSatisfied = inputValue.length >= minLength
+   const doFilterSuggestions = useCallback(() => {
+      dispatch({
+         type: SuggestionActionKind.SET_FILTERED_SUGGESTIONS, payload: {
+            suggestions,
+            filterSuggestions: filterSuggestions!,
+            inputValue: inputRef.getValue(),
+            minLength,
+         }
+      })
 
-      const nextFilteredSuggestions = minLengthSatisfied
-         ? suggestions.filter(suggestion => filterSuggestions!(inputValue, suggestion))
-         : []
-
-      setFilteredSuggestions(nextFilteredSuggestions)
-      setIsSuggestionMenuOpen(minLengthSatisfied)
       keyboardVerticalNavigation.resetIndex()
    }, [minLength, suggestions])
+
+   const selectSuggestion = (item: T) => {
+      dispatch({ type: SuggestionActionKind.SELECT_SUGGESTION, payload: item })
+
+      setInputRefValue(getSuggestionLabel!(item), "selected")
+      keyboardVerticalNavigation.resetIndex()
+
+      onObjectSelected?.(item)
+   }
 
    const setInputRefValue = (value: string, changeType: ChangeType, shouldForceRerender: boolean = false) => {
       inputRef.setValue(value, shouldForceRerender)
@@ -103,22 +114,13 @@ const AutocompleteInner = <T extends SuggestionType>({
       onInputChange?.(value, changeType)
    }
 
-   const selectSuggestion = (item: T) => {
-      setSelectedSuggestion(item)
-      setIsSuggestionMenuOpen(false)
-      setInputRefValue(getSuggestionLabel!(item), "selected")
-      keyboardVerticalNavigation.resetIndex()
-
-      onObjectSelected?.(item)
-   }
-
    getSuggestionLabel ??= (suggestion: T) => suggestion.toString()
 
    filterSuggestions ??= (inputValue: string, suggestion: T) => getSuggestionLabel!(suggestion).toLowerCase().includes(inputValue.toLowerCase())
 
-   useEffect(() => suggestionsMenuHandle(), [suggestions])
+   useEffect(() => doFilterSuggestions(), [suggestions])
 
-   const shouldSeeSuggestions = !isLoading && isSuggestionMenuOpen && !!filteredSuggestions.length
+   const shouldSeeSuggestions = !isLoading && isMenuOpen && !!filteredSuggestions.length
 
    return (
       <div className="autocomplete-root" ref={rootRef}>
